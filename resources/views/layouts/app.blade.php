@@ -81,6 +81,7 @@
         <a href="{{ route('dashboard') }}" class="nav-link text-white mb-2 p-2 rounded sidebar-link">Dashboard</a>
 
         @if(auth()->user()->role == 'admin')
+            <a href="{{ route('admin.users.index') }}" class="nav-link text-white mb-2 p-2 rounded sidebar-link">Users</a>
             <a href="{{ route('projects.index') }}" class="nav-link text-white mb-2 p-2 rounded sidebar-link">Projects</a>
             <a href="{{ route('tasks.index') }}" class="nav-link text-white mb-2 p-2 rounded sidebar-link">Tasks</a>
             <a href="{{ route('admin.report') }}" class="nav-link text-white mb-2 p-2 rounded sidebar-link">Reports</a>

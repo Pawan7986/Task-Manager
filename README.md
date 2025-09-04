@@ -61,3 +61,4 @@ After running `php artisan migrate --seed`, a default admin user will be created
 
 - **Email:** kmr.fam07@gmail.com  
 - **Password:** admin@123
+cls

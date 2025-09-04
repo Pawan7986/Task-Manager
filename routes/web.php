@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,9 +34,32 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 
-Route::middleware('auth')->group(function () {
+
+// 1. Verify Notice Page (jab user register hote hi redirect hoga yaha)
+Route::get('/email/verify', function () {
+    return view('auth.verify-email'); // is view me "Please verify your email" message hoga
+})->middleware('auth')->name('verification.notice');
+
+// 2. Verify Callback (jab user email ke link par click karega)
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // email verified mark ho jayega
+
+    return redirect('/dashboard'); // successfully verified hone ke baad
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// 3. Resend Verification Link (agar user phirse link bhejna chahe)
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('status', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
+Route::middleware('auth','verified')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function() {
@@ -62,6 +90,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
         Route::get('tasks/{id}', [App\Http\Controllers\TaskController::class, 'show2'])->name('tasks.show2');
 
+         Route::get('/admin/users', [AuthController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/{id}/status', [AuthController::class, 'updateStatus'])->name('admin.users.updateStatus');
+    Route::get('/admin/users/{id}', [AuthController::class, 'show'])->name('admin.users.show');
+
+
 
 
 
@@ -77,3 +110,14 @@ Route::middleware('auth')->group(function () {
     });
 
 });
+Route::get('forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
+
+Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
+
+// Route::middleware(['auth', 'can:isAdmin'])->group(function () {
+//     Route::get('/admin/users', [AuthController::class, 'index'])->name('admin.users.index');
+//     Route::post('/admin/users/{id}/status', [AuthController::class, 'updateStatus'])->name('admin.users.updateStatus');
+// });
+

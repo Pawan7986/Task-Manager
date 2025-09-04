@@ -153,12 +153,30 @@
             @error('email')
                 <div style="color:red">{{ $message }}</div>
             @enderror
-            <input type="password" name="password" class="form-control" placeholder="Password" required>
+      <div class="mb-3 position-relative">
+    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+    <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer;" onclick="togglePassword()">
+        👁‍🗨
+    </span>
+</div>
+
+@error('password')
+    <div style="color:red">{{ $message }}</div>
+@enderror
+    <script>
+function togglePassword() {
+    const passwordField = document.getElementById('password');
+    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordField.setAttribute('type', type);
+}
+</script>
+
              @error('password')
                 <div style="color:red">{{ $message }}</div>
             @enderror
             <button type="submit" class="btn btn-light text-dark btn-custom">Login</button>
         </form>
+        <a href="{{ route('password.request') }}" class="text-light">Forgot Password?</a>
         <a href="{{ route('register') }}" class="register-link">Don't have an account? Register</a>
     </div>
 
